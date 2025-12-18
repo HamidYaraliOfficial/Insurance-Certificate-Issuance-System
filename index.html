@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گواهی بیمه باربری - نمایندگی </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        /* استایل اجباری برای ورودی ها جهت خوانایی */
+        input, select {
+            color: #111827 !important; /* مشکی تیره */
+            background-color: #ffffff !important;
+        }
+
+        /* مخفی کردن اسکرول بار برای زیبایی */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #005f73; 
+            border-radius: 4px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        /* --- تنظیمات پیشرفته چاپ A5 --- */
+        @media print {
+            @page {
+                size: A5 portrait; /* سایز کاغذ A5 عمودی */
+                margin: 0; /* حذف حاشیه های مرورگر */
+            }
+            
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
+            /* مخفی کردن همه چیز به جز ناحیه چاپ */
+            body * {
+                visibility: hidden;
+            }
+            
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: fixed;
+                /* تکنیک وسط چین کردن دقیق در صفحه */
+                inset: 0;
+                margin: auto;
+                
+                width: 148mm; /* عرض استاندارد A5 */
+                height: 209mm; /* ارتفاع استاندارد A5 (کمی کمتر برای اطمینان) */
+                
+                padding: 10mm; /* حاشیه داخلی سفید و زیبا */
+                background: white;
+                color: black;
+                
+                display: flex !important;
+                flex-direction: column;
+                justify-content: space-between;
+                box-sizing: border-box;
+                z-index: 9999;
+                
+                /* اطمینان از چاپ رنگ پس زمینه */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* انیمیشن ها */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* استایل مودال */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="text-gray-800 h-screen overflow-hidden flex flex-col">
+
+    <!-- بخش لاگین -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-blue-900 to-teal-800 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 text-center fade-in">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-12 h-12 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">بیمه سینا</h2>
+            <p class="text-sm text-gray-500 mb-6">نمایندگی  - کد 6065</p>
+            <input type="password" id="password-input" placeholder="رمز عبور (1234)" class="w-full p-3 border border-gray-300 rounded-lg mb-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="checkLogin()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition shadow-lg">ورود به سیستم</button>
+        </div>
+    </div>
+
+    <!-- مودال ویرایش کامل -->
+    <div id="edit-modal" class="modal fixed inset-0 z-40 hidden flex items-center justify-center">
+        <div class="bg-white w-[600px] rounded-2xl shadow-2xl p-6 fade-in relative">
+            <button onclick="closeEditModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold mb-4 text-blue-800 border-b pb-2">ویرایش کامل سند</h3>
+            <input type="hidden" id="edit-cert-id-hidden">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold mb-1">شماره سند</label>
+                    <input type="text" id="edit-sanad-id" disabled class="w-full p-2 bg-gray-100 rounded border">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-1">تاریخ سند</label>
+                    <input type="text" id="edit-sanad-date" class="w-full p-2 border rounded">
+                </div>
+                
+                <div class="col-span-2 bg-yellow-50 p-2 rounded border border-yellow-200">
+                    <label class="block text-sm font-bold mb-1">شرکت (تغییر شرکت لیست بیمه‌ها را تغییر می‌دهد)</label>
+                    <select id="edit-company" onchange="loadPoliciesForEditModal()" class="w-full p-2 border rounded bg-white"></select>
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-bold mb-1">بیمه نامه</label>
+                    <select id="edit-policy" class="w-full p-2 border rounded bg-white"></select>
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-bold mb-1">شماره کوتاژها</label>
+                    <input type="text" id="edit-cottage" class="w-full p-2 border rounded">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold mb-1">تعداد</label>
+                    <input type="number" id="edit-count" class="w-full p-2 border rounded">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold mb-1">ارزش (ریال)</label>
+                    <input type="text" id="edit-value" onkeyup="formatCurrency(this)" class="w-full p-2 border rounded font-mono">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="closeEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">انصراف</button>
+                <button onclick="saveEdit()" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg">ذخیره تغییرات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- محتوای اصلی برنامه -->
+    <div id="app-content" class="hidden flex-1 flex flex-col h-full relative">
+        
+        <!-- هدر -->
+        <header class="bg-white shadow-md z-10 flex justify-between items-center px-6 py-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">سیستم صدور گواهی بیمه باربری</h1>
+                    <p class="text-xs text-gray-500">نمایندگی  | کد 6065</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="text-red-500 hover:bg-red-50 px-3 py-1 rounded transition text-sm font-bold">خروج</button>
+        </header>
+
+        <main class="flex-1 overflow-auto p-6 flex gap-6">
+            
+            <!-- منوی کناری (داشبورد) -->
+            <aside class="w-1/4 min-w-[250px]">
+                <div class="glass-panel rounded-2xl p-4 h-full flex flex-col gap-4">
+                    <div class="text-center mb-2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2702/2702602.png" alt="Logo" class="w-24 h-24 mx-auto mb-2 opacity-80">
+                        <h3 class="font-bold text-gray-700">پنل دسترسی سریع</h3>
+                    </div>
+                    
+                    <button onclick="showSection('create-cert')" class="nav-btn bg-gradient-to-l from-blue-600 to-blue-500 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex items-center gap-3 text-right group">
+                        <span class="bg-white/20 p-2 rounded-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></span>
+                        <div>
+                            <div class="font-bold">ثبت گواهی</div>
+                            <div class="text-xs opacity-80">صدور سند جدید</div>
+                        </div>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="showSection('new-policy')" class="nav-btn bg-white text-gray-700 border border-gray-200 p-3 rounded-xl hover:bg-teal-50 hover:border-teal-200 transition flex flex-col items-center gap-2 shadow-sm">
+                            <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                            <span class="text-xs font-bold">بیمه جدید</span>
+                        </button>
+                        <button onclick="showSection('companies')" class="nav-btn bg-white text-gray-700 border border-gray-200 p-3 rounded-xl hover:bg-purple-50 hover:border-purple-200 transition flex flex-col items-center gap-2 shadow-sm">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            <span class="text-xs font-bold">شرکت ها</span>
+                        </button>
+                        <button onclick="showSection('history')" class="nav-btn bg-white text-gray-700 border border-gray-200 p-3 rounded-xl hover:bg-orange-50 hover:border-orange-200 transition flex flex-col items-center gap-2 shadow-sm">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="text-xs font-bold">سوابق</span>
+                        </button>
+                        <button onclick="showSection('report')" class="nav-btn bg-white text-gray-700 border border-gray-200 p-3 rounded-xl hover:bg-green-50 hover:border-green-200 transition flex flex-col items-center gap-2 shadow-sm">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="text-xs font-bold">مانده بیمه</span>
+                        </button>
+                        <button onclick="showSection('settings')" class="nav-btn bg-white text-gray-700 border border-gray-200 p-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition flex flex-col items-center gap-2 shadow-sm">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="text-xs font-bold">تنظیمات</span>
+                        </button>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-gray-200">
+                        <button onclick="showSection('backup')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            پشتیبان‌گیری / بازیابی
+                        </button>
+                        <div class="text-center text-xs text-gray-400 mt-3 pt-2 font-mono dir-ltr">
+                            <div class="mb-1 text-gray-500 font-bold font-sans">طراح: HY9 </div>
+                            <a href="#" target="_blank" class="hover:text-blue-600 transition">#</a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- محتوای پنل ها -->
+            <section class="flex-1 glass-panel rounded-2xl p-8 overflow-y-auto relative">
+                
+                <!-- 1. ثبت گواهی (Wizard) -->
+                <div id="create-cert" class="section-content fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-blue-800 flex items-center gap-2">
+                        <span class="bg-blue-100 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></span>
+                        ثبت گواهی (سند زدن)
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- انتخاب شرکت و بیمه -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">مرحله ۱: انتخاب بیمه نامه</h3>
+                            <!-- کلاس های text-gray-900 و bg-white برای اطمینان از رنگ متن مشکی اضافه شدند -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">نام شرکت</label>
+                                    <select id="cert-company" onchange="loadCompanyPoliciesForCert()" class="w-full p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 transition"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">انتخاب بیمه نامه (شماره - تاریخ - مانده)</label>
+                                    <select id="cert-policy" class="w-full p-2 border rounded-lg bg-white text-gray-900 text-sm"></select>
+                                </div>
+                                <div id="policy-details" class="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg hidden">
+                                    <!-- جزییات بیمه انتخاب شده اینجا می آید -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- اطلاعات سند -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">مرحله ۲: مشخصات سند</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">شماره سند (سیستمی)</label>
+                                    <input type="text" id="cert-id" readonly class="w-full p-2 border bg-gray-100 text-gray-500 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">تاریخ صدور سند</label>
+                                    <input type="text" id="cert-date" placeholder="مثلا: 1403/08/29" class="w-full p-2 border rounded-lg dir-ltr text-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mt-6">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">مرحله ۳: اطلاعات محموله و ارزش</h3>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">شماره کوتاژها (با خط فاصله - جدا کنید)</label>
+                                <input type="text" id="cert-cottage" onblur="checkCottageDuplicates()" class="w-full p-2 border rounded-lg" placeholder="مثلا: 100254 - 100255">
+                                <p id="cottage-warning" class="text-red-500 text-xs mt-1 hidden"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">تعداد</label>
+                                <input type="number" id="cert-count" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ارزش (ریال)</label>
+                                <input type="text" id="cert-value" onkeyup="formatCurrency(this)" class="w-full p-2 border rounded-lg font-mono" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">مبدا / مقصد</label>
+                                <input type="text" value="امارات عربی / بندرلنگه" readonly class="w-full p-2 border bg-gray-100 text-gray-600 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="submitCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            ثبت و پیش‌نمایش چاپ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. بیمه جدید -->
+                <div id="new-policy" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-teal-800">ثبت بیمه نامه جدید</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm max-w-2xl mx-auto">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">انتخاب شرکت</label>
+                                <!-- اصلاح رنگ متن در اینجا -->
+                                <select id="policy-company" class="w-full p-2 border rounded-lg bg-white text-gray-900"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">شماره بیمه نامه</label>
+                                <input type="text" id="policy-no" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">تاریخ صدور (شمسی)</label>
+                                <input type="text" id="policy-date" placeholder="1403/01/01" class="w-full p-2 border rounded-lg text-right" dir="ltr">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">ارزش کل بیمه نامه (ریال)</label>
+                                <input type="text" id="policy-value" onkeyup="formatCurrency(this)" class="w-full p-2 border rounded-lg font-mono">
+                            </div>
+                            <button onclick="savePolicy()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition">ثبت بیمه نامه</button>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h3 class="font-bold border-b mb-2 pb-1">لیست بیمه نامه‌ها (جهت ویرایش کلیک کنید)</h3>
+                            <div id="policies-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. شرکت ها -->
+                <div id="companies" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-purple-800">مدیریت شرکت‌ها</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm max-w-lg mx-auto">
+                        <div class="flex gap-2 mb-6">
+                            <input type="text" id="company-name" placeholder="نام شرکت را وارد کنید..." class="flex-1 p-2 border rounded-lg">
+                            <button onclick="addCompany()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 rounded-lg font-bold">افزودن</button>
+                        </div>
+                        <div id="company-list" class="space-y-2">
+                            <!-- لیست شرکت ها -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. سوابق -->
+                <div id="history" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-orange-800">سوابق اسناد</h2>
+                    <div class="mb-4 bg-white p-4 rounded-xl flex items-center gap-4">
+                        <span>فیلتر بر اساس شرکت:</span>
+                        <select id="history-company-filter" onchange="loadHistory()" class="p-2 border rounded-lg min-w-[200px] bg-white text-gray-900">
+                            <option value="">همه شرکت‌ها</option>
+                        </select>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th class="p-3">سند</th>
+                                    <th class="p-3">تاریخ</th>
+                                    <th class="p-3">شرکت</th>
+                                    <th class="p-3">بیمه نامه</th>
+                                    <th class="p-3">کوتاژها</th>
+                                    <th class="p-3">ارزش (ریال)</th>
+                                    <th class="p-3">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 5. گزارش مانده -->
+                <div id="report" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-green-800">گزارش مانده بیمه</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="mb-4">
+                            <label class="font-bold text-gray-700 ml-2">انتخاب شرکت:</label>
+                            <select id="report-company" onchange="generateReport()" class="p-2 border rounded-lg w-64 bg-white text-gray-900"></select>
+                        </div>
+                        <div id="report-result" class="grid grid-cols-1 gap-4"></div>
+                    </div>
+                </div>
+                
+                <!-- 7. تنظیمات (لوگو) -->
+                <div id="settings" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">تنظیمات برنامه</h2>
+                    <div class="bg-white p-8 rounded-xl shadow-sm max-w-xl mx-auto">
+                        <h3 class="font-bold text-lg mb-4 border-b pb-2">تنظیم لوگوی چاپی</h3>
+                        <p class="text-sm text-gray-500 mb-4">در اینجا میتوانید لوگوی شرکت را تغییر دهید. فایل انتخابی در حافظه برنامه ذخیره میشود و نیازی به اینترنت نیست.</p>
+                        
+                        <div class="flex flex-col gap-4">
+                            <input type="file" id="logo-upload" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-lg p-2">
+                            
+                            <div class="flex gap-2">
+                                <button onclick="saveLogo()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-bold flex-1">ذخیره لوگو</button>
+                                <button onclick="resetLogo()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition">بازنشانی به پیش‌فرض</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <p class="text-xs text-gray-400 mb-2">پیش‌نمایش لوگوی فعلی:</p>
+                            <div id="current-logo-preview" class="border p-4 rounded-lg inline-block bg-gray-50">
+                                <!-- لوگو اینجا نمایش داده میشود -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. پشتیبان گیری -->
+                <div id="backup" class="section-content hidden fade-in">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">پشتیبان‌گیری و بازیابی</h2>
+                    <div class="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
+                        <div class="bg-white p-8 rounded-xl shadow-sm text-center border-2 border-dashed border-blue-200">
+                            <svg class="w-16 h-16 text-blue-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <h3 class="font-bold text-lg mb-2">دریافت فایل پشتیبان</h3>
+                            <p class="text-sm text-gray-500 mb-4">دانلود تمامی اطلاعات (شرکت‌ها، بیمه‌ها، اسناد) در یک فایل.</p>
+                            <button onclick="downloadBackup()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">دانلود فایل</button>
+                        </div>
+                        <div class="bg-white p-8 rounded-xl shadow-sm text-center border-2 border-dashed border-green-200">
+                            <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <h3 class="font-bold text-lg mb-2">بازیابی اطلاعات</h3>
+                            <p class="text-sm text-gray-500 mb-4">فایل پشتیبان را انتخاب کنید تا اطلاعات بازگردانده شود.</p>
+                            <input type="file" id="restore-file" class="hidden" onchange="restoreBackup(this)">
+                            <button onclick="document.getElementById('restore-file').click()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">انتخاب فایل</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- قسمت چاپ (مخفی در حالت عادی) -->
+    <div id="print-area" class="hidden">
+        <!-- محتوا توسط جاوااسکریپت پر میشود -->
+    </div>
+
+    <script>
+        // --- مدیریت داده ها (Database Logic) ---
+        const db = {
+            get: (key) => JSON.parse(localStorage.getItem(key) || '[]'),
+            set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
+            
+            // جداول: companies, policies, certificates, config
+        };
+
+        let currentSanadId = parseInt(localStorage.getItem('nextSanadId') || '4000');
+
+        // --- توابع عمومی ---
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function parseCurrency(str) {
+            return parseInt(str.replace(/,/g, '') || '0');
+        }
+
+        function formatCurrency(input) {
+            let val = parseCurrency(input.value);
+            input.value = formatNumber(val);
+        }
+
+        function getTodayJalali() {
+            return new Intl.DateTimeFormat('fa-IR').format(new Date());
+        }
+
+        function checkLogin() {
+            const pass = document.getElementById('password-input').value;
+            if (pass === '1234') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                initializeApp();
+            } else {
+                alert('رمز عبور اشتباه است!');
+                document.getElementById('password-input').value = '';
+            }
+        }
+        
+        function logout() {
+            location.reload();
+        }
+
+        function initializeApp() {
+            loadCompanies();
+            loadPoliciesList();
+            document.getElementById('cert-date').value = getTodayJalali();
+            document.getElementById('cert-id').value = currentSanadId;
+            showSection('create-cert'); // پیش فرض
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            // رفرش کردن دیتاها هنگام ورود به هر بخش
+            if(id === 'create-cert') {
+                loadCompaniesToSelect('cert-company');
+                document.getElementById('cert-id').value = currentSanadId;
+            }
+            if(id === 'new-policy') {
+                loadCompaniesToSelect('policy-company');
+                loadPoliciesList();
+            }
+            if(id === 'companies') loadCompanies();
+            if(id === 'history') {
+                loadCompaniesToSelect('history-company-filter');
+                loadHistory();
+            }
+            if(id === 'report') {
+                loadCompaniesToSelect('report-company');
+                generateReport();
+            }
+            if(id === 'settings') {
+                updateLogoPreview();
+            }
+        }
+
+        function loadCompaniesToSelect(selectId) {
+            const companies = db.get('companies');
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">انتخاب کنید...</option>';
+            companies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name; // اطمینان از نمایش متن
+                select.appendChild(opt);
+            });
+        }
+
+        // --- مدیریت شرکت ها ---
+        function addCompany() {
+            const name = document.getElementById('company-name').value.trim();
+            if (!name) return alert('نام شرکت را وارد کنید');
+            
+            let companies = db.get('companies');
+            if(companies.find(c => c.name === name)) return alert('این شرکت قبلا ثبت شده است');
+
+            companies.push({ id: Date.now(), name: name });
+            db.set('companies', companies);
+            document.getElementById('company-name').value = '';
+            loadCompanies();
+            alert('شرکت با موفقیت ثبت شد');
+        }
+
+        function loadCompanies() {
+            const list = document.getElementById('company-list');
+            const companies = db.get('companies');
+            list.innerHTML = '';
+            companies.forEach(c => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded border">
+                        <span class="font-bold">${c.name}</span>
+                        <div class="flex gap-2">
+                            <button onclick="editCompany(${c.id})" class="text-blue-600 text-sm">ویرایش</button>
+                            <button onclick="deleteCompany(${c.id})" class="text-red-600 text-sm">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function deleteCompany(id) {
+            if(!confirm('آیا مطمئن هستید؟ تمامی بیمه ها و سوابق این شرکت دچار مشکل خواهند شد!')) return;
+            let companies = db.get('companies');
+            companies = companies.filter(c => c.id !== id);
+            db.set('companies', companies);
+            loadCompanies();
+        }
+
+        function editCompany(id) {
+             let companies = db.get('companies');
+             const company = companies.find(c => c.id === id);
+             const newName = prompt('نام جدید شرکت:', company.name);
+             if(newName && newName !== company.name) {
+                 company.name = newName;
+                 db.set('companies', companies);
+                 loadCompanies();
+             }
+        }
+
+
+        // --- مدیریت بیمه نامه ها ---
+        function savePolicy() {
+            const company = document.getElementById('policy-company').value;
+            const no = document.getElementById('policy-no').value;
+            const date = document.getElementById('policy-date').value;
+            const valStr = document.getElementById('policy-value').value;
+
+            if (!company || !no || !date || !valStr) return alert('همه فیلدها الزامی هستند');
+
+            const value = parseCurrency(valStr);
+            let policies = db.get('policies');
+            
+            // افزودن
+            policies.push({
+                id: Date.now(),
+                company: company,
+                no: no,
+                date: date,
+                totalValue: value,
+                remaining: value // ابتدا برابر کل است
+            });
+            
+            db.set('policies', policies);
+            alert('بیمه نامه ثبت شد');
+            loadPoliciesList();
+            
+            // Clear inputs
+            document.getElementById('policy-no').value = '';
+            document.getElementById('policy-value').value = '';
+        }
+
+        function loadPoliciesList() {
+            const list = document.getElementById('policies-list');
+            const policies = db.get('policies');
+            list.innerHTML = '';
+            policies.forEach(p => {
+                list.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded border text-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-teal-700">${p.company}</div>
+                            <div>ش: ${p.no} | تاریخ: ${p.date}</div>
+                            <div class="text-gray-500">ارزش: ${formatNumber(p.totalValue)} | مانده: ${formatNumber(p.remaining)}</div>
+                        </div>
+                        <div class="flex gap-2">
+                             <button onclick="editPolicy(${p.id})" class="text-blue-500 border px-2 rounded hover:bg-blue-50">ویرایش</button>
+                             <button onclick="deletePolicy(${p.id})" class="text-red-500 border px-2 rounded hover:bg-red-50">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function editPolicy(id) {
+            let policies = db.get('policies');
+            const p = policies.find(x => x.id === id);
+            if(!p) return;
+            
+            // Simplified edit for demo
+            const newNo = prompt("شماره بیمه نامه:", p.no);
+            const newDate = prompt("تاریخ صدور:", p.date);
+            const newVal = prompt("ارزش کل (ریال):", p.totalValue); // Note: Changing value here is tricky if certs exist
+            
+            if(newNo && newDate && newVal) {
+                const oldTotal = p.totalValue;
+                const newTotal = parseInt(newVal);
+                const diff = newTotal - oldTotal;
+                
+                p.no = newNo;
+                p.date = newDate;
+                p.totalValue = newTotal;
+                p.remaining = p.remaining + diff; // Adjust remaining by the difference
+                
+                db.set('policies', policies);
+                loadPoliciesList();
+            }
+        }
+        
+        function deletePolicy(id) {
+             if(!confirm('با حذف بیمه نامه، سوابق مربوط به آن نامعتبر میشوند. ادامه میدهید؟')) return;
+             let policies = db.get('policies');
+             policies = policies.filter(p => p.id !== id);
+             db.set('policies', policies);
+             loadPoliciesList();
+        }
+
+
+        // --- ثبت گواهی (Logic اصلی) ---
+        function loadCompanyPoliciesForCert() {
+            const compName = document.getElementById('cert-company').value;
+            const policySelect = document.getElementById('cert-policy');
+            policySelect.innerHTML = '';
+            
+            const policies = db.get('policies').filter(p => p.company === compName && p.remaining > 0);
+            
+            if (policies.length === 0) {
+                const opt = document.createElement('option');
+                opt.text = "بیمه نامه دارای اعتبار یافت نشد";
+                policySelect.appendChild(opt);
+                return;
+            }
+
+            policies.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = `ش: ${p.no} - ${p.date} - (مانده: ${formatNumber(p.remaining)})`;
+                policySelect.appendChild(opt);
+            });
+        }
+
+        function checkCottageDuplicates() {
+            const val = document.getElementById('cert-cottage').value;
+            if (!val) return;
+            const parts = val.split('-').map(s => s.trim());
+            const certs = db.get('certificates');
+            const warningEl = document.getElementById('cottage-warning');
+            
+            let found = [];
+            certs.forEach(c => {
+                const cParts = c.cottage.split('-').map(s => s.trim());
+                parts.forEach(p => {
+                    if(cParts.includes(p)) found.push(`سند ${c.sanadId}`);
+                });
+            });
+
+            if (found.length > 0) {
+                warningEl.textContent = `اخطار: این کوتاژها قبلا در ${found.join(', ')} استفاده شده‌اند!`;
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
+
+        function submitCertificate() {
+            const policyId = parseInt(document.getElementById('cert-policy').value);
+            const sanadId = parseInt(document.getElementById('cert-id').value);
+            const sanadDate = document.getElementById('cert-date').value;
+            const cottage = document.getElementById('cert-cottage').value;
+            const count = document.getElementById('cert-count').value;
+            const amountVal = parseCurrency(document.getElementById('cert-value').value);
+
+            if (!policyId || !cottage || !count || !amountVal) return alert("لطفا تمام موارد را پر کنید");
+
+            let policies = db.get('policies');
+            let policyIndex = policies.findIndex(p => p.id === policyId);
+            let policy = policies[policyIndex];
+
+            if (amountVal > policy.remaining) {
+                return alert(`مبلغ سند (${formatNumber(amountVal)}) بیشتر از مانده بیمه نامه (${formatNumber(policy.remaining)}) است!`);
+            }
+
+            // کسر از بیمه
+            policy.remaining -= amountVal;
+            policies[policyIndex] = policy; // Update
+            
+            // ثبت سند
+            let certs = db.get('certificates');
+            const newCert = {
+                id: Date.now(),
+                sanadId: sanadId,
+                sanadDate: sanadDate,
+                company: policy.company,
+                policyNo: policy.no,
+                policyId: policy.id, // ذخیره ID برای رجوع بعدی
+                policyDate: policy.date,
+                policyTotalValue: policy.totalValue,
+                cottage: cottage,
+                count: count,
+                value: amountVal,
+                originDest: "امارات عربی / بندرلنگه",
+                remainingAfter: policy.remaining // Snapshot of remaining at this time
+            };
+            certs.push(newCert);
+
+            // ذخیره سازی
+            db.set('policies', policies);
+            db.set('certificates', certs);
+            localStorage.setItem('nextSanadId', sanadId + 1);
+            
+            // بروزرسانی UI
+            currentSanadId++;
+            document.getElementById('cert-id').value = currentSanadId;
+            document.getElementById('cert-value').value = '';
+            document.getElementById('cert-cottage').value = '';
+            document.getElementById('cert-count').value = '';
+            document.getElementById('cottage-warning').classList.add('hidden');
+            loadCompanyPoliciesForCert(); // Reload remaining value in select
+
+            // چاپ
+            printCertificate(newCert);
+        }
+
+        // --- تنظیمات لوگو ---
+        function saveLogo() {
+            const input = document.getElementById('logo-upload');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('app_logo', e.target.result);
+                    alert('لوگو با موفقیت ذخیره شد!');
+                    updateLogoPreview();
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                alert('لطفا یک فایل عکس انتخاب کنید.');
+            }
+        }
+
+        function resetLogo() {
+            if(confirm('آیا مطمئن هستید؟ لوگوی پیش فرض نمایش داده خواهد شد.')) {
+                localStorage.removeItem('app_logo');
+                updateLogoPreview();
+                alert('لوگو بازنشانی شد.');
+            }
+        }
+
+        function updateLogoPreview() {
+            const logoData = localStorage.getItem('app_logo');
+            const container = document.getElementById('current-logo-preview');
+            if (logoData) {
+                container.innerHTML = `<img src="${logoData}" style="max-width: 100px; max-height: 100px;">`;
+            } else {
+                // SVG پیش فرض
+                container.innerHTML = `<svg width='60' height='60' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='45' stroke='#005f73' stroke-width='5'/><path d='M50 20V80M20 50H80' stroke='#005f73' stroke-width='5'/><text x='50' y='55' font-family='Arial' font-size='12' text-anchor='middle' fill='#005f73'>SINA</text></svg> <div class="text-xs mt-2">لوگوی پیش فرض</div>`;
+            }
+        }
+
+        // --- چاپ ---
+        function printCertificate(cert) {
+            const printArea = document.getElementById('print-area');
+            
+            // لوگوی پیش فرض
+            const defaultSvg = `<svg width='60' height='60' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='45' stroke='#005f73' stroke-width='5'/><path d='M50 20V80M20 50H80' stroke='#005f73' stroke-width='5'/><text x='50' y='55' font-family='Arial' font-size='12' text-anchor='middle' fill='#005f73'>SINA</text></svg>`;
+            
+            // بررسی اینکه آیا کاربر لوگو آپلود کرده است؟
+            const customLogo = localStorage.getItem('app_logo');
+            
+            let logoHtml;
+            if (customLogo) {
+                logoHtml = `<img src="${customLogo}" alt="Logo" style="width: 60px; height: 60px; object-fit: contain;">`;
+            } else {
+                logoHtml = defaultSvg;
+            }
+
+            printArea.innerHTML = `
+                <!-- سربرگ -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px;">
+                    <div></div>
+                    <div style="text-align: center;">
+                        <h2 style="font-size: 20px; font-weight: bold; margin: 0;">بیمه سینا</h2>
+                        <h3 style="font-size: 14px; margin: 3px 0;">گواهی حمل بار داخلی/وارداتی</h3>
+                    </div>
+                    <div style="text-align: center;">
+                        ${logoHtml}
+                        <div style="font-size: 10px; font-weight: bold; margin-top: 2px;">نمایندگی </div>
+                        <div style="font-size: 10px;">کد 6065</div>
+                    </div>
+                </div>
+
+                <!-- بدنه اصلی -->
+                <div style="flex-grow: 1; font-size: 13px; line-height: 2.2; display: flex; flex-direction: column; gap: 10px;">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <div><strong>شماره سند:</strong> <span style="font-family: 'Courier New', monospace; font-size: 15px;">${cert.sanadId}</span></div>
+                        <div><strong>تاریخ صدور سند:</strong> ${cert.sanadDate}</div>
+                    </div>
+
+                    <div style="border: 1px solid #000; padding: 10px; border-radius: 5px;">
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">نام شرکت:</div>
+                            <div>${cert.company}</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">شماره بیمه نامه:</div>
+                            <div>${cert.policyNo}</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">تاریخ بیمه نامه:</div>
+                            <div>${cert.policyDate}</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">ارزش کل بیمه:</div>
+                            <div>${formatNumber(cert.policyTotalValue)} ریال</div>
+                        </div>
+                    </div>
+
+                    <div style="border: 1px solid #000; padding: 10px; border-radius: 5px;">
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">مبدا و مقصد:</div>
+                            <div>${cert.originDest}</div>
+                        </div>
+                         <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">شماره کوتاژها:</div>
+                            <div style="width: 70%; word-wrap: break-word;">${cert.cottage}</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">تعداد:</div>
+                            <div>${cert.count}</div>
+                        </div>
+                        <div style="display: flex; margin-bottom: 5px;">
+                            <div style="width: 110px; font-weight: bold;">ارزش محموله:</div>
+                            <div style="font-weight: bold; font-size: 14px;">${formatNumber(cert.value)} ریال</div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f0f0f0; padding: 8px; border: 1px solid #000; border-radius: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 12px;">
+                        <span>مانده اعتبار بیمه نامه:</span>
+                        <span>${formatNumber(cert.remainingAfter)} ریال</span>
+                    </div>
+
+                </div>
+
+                <!-- پاورقی -->
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding: 0 10px;">
+                        <div></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 12px;">مهر و امضاء بیمه گر</div>
+                            <div style="height: 40px;"></div> <!-- فضای امضا -->
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid black; padding-top: 5px; text-align: center; font-size: 10px;">
+                        آدرس: بندرلنگه، مجتمع یاقوت، طبقه اول | تلفن: 09173621318
+                    </div>
+                </div>
+            `;
+
+            window.print();
+        }
+
+        // --- سوابق و ویرایش ---
+        function loadHistory() {
+            const filterComp = document.getElementById('history-company-filter').value;
+            let certs = db.get('certificates');
+            if (filterComp) {
+                certs = certs.filter(c => c.company === filterComp);
+            }
+            // Sort descending by ID
+            certs.sort((a, b) => b.sanadId - a.sanadId);
+
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            certs.forEach(c => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 border-b font-mono">${c.sanadId}</td>
+                        <td class="p-3 border-b">${c.sanadDate}</td>
+                        <td class="p-3 border-b font-bold text-gray-700">${c.company}</td>
+                        <td class="p-3 border-b text-xs">${c.policyNo}</td>
+                        <td class="p-3 border-b text-xs max-w-[150px] truncate" title="${c.cottage}">${c.cottage}</td>
+                        <td class="p-3 border-b text-teal-600 font-bold">${formatNumber(c.value)}</td>
+                        <td class="p-3 border-b flex gap-2">
+                            <button onclick='rePrint(${JSON.stringify(c)})' class="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">چاپ</button>
+                            <button onclick='openEditModal(${JSON.stringify(c)})' class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200">ویرایش</button>
+                            <button onclick='deleteCertificate(${c.id})' class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function rePrint(cert) {
+            printCertificate(cert);
+        }
+        
+        function deleteCertificate(id) {
+            if(!confirm('با حذف سند، مبلغ آن به مانده بیمه نامه برمیگردد. آیا مطمئن هستید؟')) return;
+            
+            let certs = db.get('certificates');
+            const cert = certs.find(c => c.id === id);
+            
+            // بازگرداندن مبلغ به بیمه
+            let policies = db.get('policies');
+            const policy = policies.find(p => p.id === cert.policyId || (p.no === cert.policyNo && p.company === cert.company));
+            if(policy) {
+                policy.remaining += cert.value;
+                db.set('policies', policies);
+            }
+            
+            // حذف سند
+            certs = certs.filter(c => c.id !== id);
+            db.set('certificates', certs);
+            loadHistory();
+            alert('سند حذف شد و مبلغ به بیمه نامه برگشت.');
+        }
+
+        // --- منطق جدید ویرایش ---
+
+        function openEditModal(cert) {
+            document.getElementById('edit-modal').classList.remove('hidden');
+            
+            // پر کردن اطلاعات اولیه
+            document.getElementById('edit-cert-id-hidden').value = cert.id;
+            document.getElementById('edit-sanad-id').value = cert.sanadId;
+            document.getElementById('edit-sanad-date').value = cert.sanadDate;
+            document.getElementById('edit-cottage').value = cert.cottage;
+            document.getElementById('edit-count').value = cert.count;
+            document.getElementById('edit-value').value = formatNumber(cert.value);
+            
+            // پر کردن سلکت شرکت ها
+            const companies = db.get('companies');
+            const compSelect = document.getElementById('edit-company');
+            compSelect.innerHTML = '';
+            companies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.text = c.name;
+                if(c.name === cert.company) opt.selected = true;
+                compSelect.appendChild(opt);
+            });
+            
+            // لود کردن بیمه ها بر اساس شرکت انتخاب شده
+            loadPoliciesForEditModal(cert.policyId);
+        }
+        
+        function loadPoliciesForEditModal(selectedPolicyId = null) {
+            const compName = document.getElementById('edit-company').value;
+            const policySelect = document.getElementById('edit-policy');
+            policySelect.innerHTML = '';
+            
+            // همه بیمه های شرکت را می آوریم (چه مانده داشته باشد چه نداشته باشد، چون شاید بخواهیم به بیمه قدیمی برگردانیم)
+            const policies = db.get('policies').filter(p => p.company === compName);
+            
+            if(policies.length === 0) {
+                policySelect.innerHTML = '<option>بیمه ای یافت نشد</option>';
+                return;
+            }
+
+            policies.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = `ش: ${p.no} - (مانده فعلی: ${formatNumber(p.remaining)})`;
+                // اگر آی دی بیمه با بیمه سند یکی بود انتخاب شود
+                if(selectedPolicyId && p.id === parseInt(selectedPolicyId)) {
+                    opt.selected = true;
+                }
+                policySelect.appendChild(opt);
+            });
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function saveEdit() {
+            const id = parseInt(document.getElementById('edit-cert-id-hidden').value);
+            const newDate = document.getElementById('edit-sanad-date').value;
+            const newComp = document.getElementById('edit-company').value;
+            const newPolicyId = parseInt(document.getElementById('edit-policy').value);
+            const newCottage = document.getElementById('edit-cottage').value;
+            const newCount = document.getElementById('edit-count').value;
+            const newValue = parseCurrency(document.getElementById('edit-value').value);
+
+            if(!newDate || !newComp || !newPolicyId || !newCottage || !newCount || isNaN(newValue)) {
+                return alert('لطفا تمام موارد را به درستی وارد کنید');
+            }
+
+            // گرفتن داده ها
+            let certs = db.get('certificates');
+            let policies = db.get('policies');
+            
+            // پیدا کردن سند و بیمه های قدیم و جدید
+            let certIndex = certs.findIndex(c => c.id === id);
+            if(certIndex === -1) return;
+            let cert = certs[certIndex];
+            
+            let oldPolicyIndex = policies.findIndex(p => p.id === cert.policyId || (p.no === cert.policyNo && p.company === cert.company));
+            let newPolicyIndex = policies.findIndex(p => p.id === newPolicyId);
+            
+            if(oldPolicyIndex === -1 || newPolicyIndex === -1) {
+                return alert('خطا در یافتن بیمه نامه ها. ممکن است بیمه نامه حذف شده باشد.');
+            }
+
+            let oldPolicy = policies[oldPolicyIndex];
+            let newPolicy = policies[newPolicyIndex];
+
+            // 1. بازگرداندن مبلغ قدیمی به بیمه قدیمی
+            oldPolicy.remaining += cert.value;
+            
+            // 2. چک کردن موجودی بیمه جدید (اگر بیمه جدید همان قدیمی باشد، موجودی الان شامل مبلغ برگشتی است)
+            // نکته: اگر oldPolicy و newPolicy یکی باشند، آبجکت ها رفرنس هستند و تغییر بالا روی newPolicy هم اعمال شده.
+            
+            if(newPolicy.remaining < newValue) {
+                // برگرداندن تغییرات (Rollback memory changes)
+                oldPolicy.remaining -= cert.value; 
+                return alert(`موجودی بیمه نامه انتخابی کافی نیست. مانده: ${formatNumber(newPolicy.remaining)}`);
+            }
+
+            // 3. کسر مبلغ جدید از بیمه جدید
+            newPolicy.remaining -= newValue;
+
+            // 4. آپدیت سند
+            cert.sanadDate = newDate;
+            cert.company = newComp;
+            cert.policyId = newPolicy.id;
+            cert.policyNo = newPolicy.no;
+            cert.policyDate = newPolicy.date;
+            cert.policyTotalValue = newPolicy.totalValue;
+            cert.cottage = newCottage;
+            cert.count = newCount;
+            cert.value = newValue;
+            cert.remainingAfter = newPolicy.remaining; // آپدیت مانده در لحظه ثبت
+
+            // 5. ذخیره در دیتابیس
+            // چون oldPolicy و newPolicy رفرنس بودند، آرایه policies الان آپدیت شده است
+            db.set('policies', policies);
+            db.set('certificates', certs);
+            
+            alert('ویرایش با موفقیت انجام شد.');
+            closeEditModal();
+            loadHistory();
+            if(!document.getElementById('report').classList.contains('hidden')) generateReport();
+        }
+
+        // --- گزارش ---
+        function generateReport() {
+            const compName = document.getElementById('report-company').value;
+            const div = document.getElementById('report-result');
+            div.innerHTML = '';
+            
+            if(!compName) return;
+
+            const policies = db.get('policies').filter(p => p.company === compName);
+            
+            policies.forEach(p => {
+                const percent = Math.round((p.remaining / p.totalValue) * 100);
+                let color = percent > 50 ? 'bg-green-500' : (percent > 20 ? 'bg-orange-500' : 'bg-red-500');
+                
+                div.innerHTML += `
+                    <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-lg">بیمه: ${p.no}</span>
+                            <span class="text-gray-500 text-sm">${p.date}</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>کل: ${formatNumber(p.totalValue)}</span>
+                            <span class="font-bold text-teal-700">مانده: ${formatNumber(p.remaining)}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="${color} h-2.5 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="text-xs text-right mt-1 text-gray-500">${percent}% باقی‌مانده</div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- بک آپ و بازیابی ---
+        function downloadBackup() {
+            const data = JSON.stringify(localStorage);
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SinaBackup_${getTodayJalali().replace(/\//g,'-')}.json`;
+            a.click();
+        }
+
+        function restoreBackup(input) {
+            const file = input.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // پاک کردن و جایگزینی
+                    localStorage.clear();
+                    Object.keys(data).forEach(k => {
+                        localStorage.setItem(k, data[k]);
+                    });
+                    alert('اطلاعات با موفقیت بازیابی شد. صفحه رفرش میشود.');
+                    location.reload();
+                } catch(err) {
+                    alert('فایل نامعتبر است');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+    </script>
+</body>
+</html>
